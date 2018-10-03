@@ -110,9 +110,6 @@ def hangman(secretWord):
 
     Follows the other limitations detailed in the problem write-up.
     '''
-    print('+++++++++++++++++++\n')
-    print('Welcome to Hangman!\n')
-    print('+++++++++++++++++++\n')
     print('I am thinking of a word that is',len(secretWord),'letters long')
     lettersGuessed = ''
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
@@ -239,6 +236,9 @@ def hungMan(numGuesses):
 # secretWord while you're testing)
 
 def runHangman():
+    print('+++++++++++++++++++\n')
+    print('Welcome to Hangman!\n')
+    print('+++++++++++++++++++\n')
     while True:
         secretWord = chooseWord(wordlist).lower()
         print(hangman(secretWord))
