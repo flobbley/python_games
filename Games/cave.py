@@ -73,9 +73,15 @@ def cave(protag):
                         print('All too late you realize it\'s not people in these caves, but goblins! and now they\'ve got you cornered, eager to feast on your bones')
                         results = goblin_encounter(protag)#temporary to check compatibility
                         protag = results[0]
+                        if protag.hlth <= 0:
+                            sys.exit()
                         goblins_alive = results[1]
                         if goblins_alive == False:
                             protag = safeSleep(protag, False)
+                        else:
+                            print('\nYou flee the only way you can! Towards the dark cave\n')
+                            input()
+                            protag = exploreDarkCave(protag, True, 0)
                         valid2 = True
                     elif action in act3_response:
                         print('You look at tunnels and feel overwhelming exhaustion, you decide it\'s best to just head back and find a place to sleep')
@@ -129,6 +135,8 @@ def sleep(protag):
                 print('The goblins drag you from your cage, but you manage to kick one hard enough to get yourself free\n')
                 results = goblin_encounter(protag)
                 protag = results[0]
+                if protag.hlth <=0:
+                    sys.exit()
                 goblins_alive = results[1]
                 if goblins_alive == False:
                     results = exploreLightCaveGA(protag, goblins_alive, True)
@@ -148,6 +156,8 @@ def sleep(protag):
                     break
                 else:
                     protag = results[0]
+                    if protag.hlth <=0:
+                        sys.exit()
                     companion = results[1]
                     protag = exploreDarkCave(protag, goblins_alive, companion)
                     valid = True
@@ -164,6 +174,8 @@ def sleep(protag):
                     print('and you smash right through! but the goblins are less than happy to say the least')
                     results = goblin_encounter(protag)
                     protag = results[0]
+                    if protag.hlth <=0:
+                        sys.exit()
                     goblins_alive = results[1]
                     if goblins_alive == False:
                         results = exploreLightCaveGA(protag, goblins_alive, True)
@@ -233,6 +245,8 @@ def int_check_goblins(protag):
                         print('No good! the goblins have spotted you and come charging over, weapons drawn. There\'s nowhere to run!\n')
                         results = goblin_encounter(protag)
                         protag = results[0]
+                        if protag.hlth <=0:
+                            sys.exit()
                         goblins_alive = results[1]
                         if goblins_alive == False:
                             protag = safeSleep(protag, False)
@@ -270,6 +284,8 @@ def int_check_goblins(protag):
                         print('No good! the goblins have spotted you and come charging over, weapons drawn. There\'s nowhere to run!\n')
                         results = goblin_encounter(protag)
                         protag = results[0]
+                        if protag.hlth <=0:
+                            sys.exit()
                         goblins_alive = results[1]
                         if goblins_alive == False:
                             protag = safeSleep(protag, False)
@@ -292,6 +308,8 @@ def int_check_goblins(protag):
             print('Crumble: it\'s a person! Quick, let\'s get him!')
             results = goblin_encounter(protag)
             protag = results[0]
+            if protag.hlth <=0:
+                sys.exit()
             goblins_alive = results[1]
             if goblins_alive == False:
                 protag = safeSleep(protag, False)
@@ -370,6 +388,8 @@ def goblinKing(protag):
                         print('Crumble: I need to EEEEEAAAAAAT')
                         results = goblin_encounter(protag, True)
                         protag = results[0]
+                        if protag.hlth <=0:
+                            sys.exit()
                         goblins_alive = results[1]
                         if goblins_alive == False:
                             print('after taking a minute to catch your breath, you turn to face the man in the cage')
@@ -377,10 +397,10 @@ def goblinKing(protag):
                             protag = results[0]
                             companion = results[1]
                             print('With no where else to go you cautiously enter the Dark tunnel')
-                            protag = exploreDarkCave(protag, companion)
+                            protag = exploreDarkCave(protag, False, companion)
                         else:
                             print('You flee from the goblins the only way you can. Towards the Dark Tunnel')
-                            protag = exploreDarkCave(protag, 0)
+                            protag = exploreDarkCave(protag,True, 0)
     else:
         print()
         return False
@@ -466,6 +486,7 @@ def exploreLightCaveGA(protag, goblins_alive, captured = False):
                 map_knowledge = prisoner_convo(protag, True, done, map_knowledge)
                 valid = True
                 companion = 1
+                protag = exploreDarkCave(protag, goblins_alive, companion)
             elif strength_check and leave != 0: #checks if you have chosen option 3 before
                 input()
                 print('and it gives! the door breaks from it\'s frame allowing the prisoner to step forward')
@@ -481,6 +502,7 @@ def exploreLightCaveGA(protag, goblins_alive, captured = False):
                 companion = 1
                 map_knowledge = True
                 valid = True
+                protag = exploreDarkCave(protag, goblins_alive, companion)
             else:
                 if attempt == 0:
                     input()
@@ -502,6 +524,8 @@ def exploreLightCaveGA(protag, goblins_alive, captured = False):
                 input()
             else:
                 map_knowledge = prisoner_convo(protag, False, False, False)
+                companion = 1
+                protag = exploreDarkCave(protag, goblins_alive, companion)
             done = True
         if action == '3': #runs through leaving routine
             if done == False: #checks if you have had the conversation with the prisoner
@@ -551,11 +575,263 @@ def exploreLightCaveGA(protag, goblins_alive, captured = False):
                 valid = True
     return [protag, companion]
 
-def exploreDarkCave(protag, goblins_alive, companion):
+def exploreDarkCave(protag, goblins_alive, companion, map_knowledge =  False):
     """
     a companion of 0 means the player is travelling alone, a companion of 1 means the player rescued the prisoner, a companion of 2 means the player teamed with the goblins'
     """
-    print('protag will explore the dark cavern alone, or with companions')
+    if companion >0:
+        while True:
+            print('Who should enter the dark tunnel first?')
+            print('1. You')
+            if companion == 1:
+                print('2. The prisoner')
+            else:
+                print('2. The goblins')
+            order = int(input()) #determines who goes first into dark tunnel, 1 if protagonist, 2 if companions
+            if order == 1 or order == 2:
+                break
+            else:
+                print('Invalid input')
+    print('You enter the dark tunnel, it is hard to see anything. You keep your hand against the wall to know where you are going, but a deep chasm runs along the left side of the path')
+    encounter = randint(1,5)
+    if encounter < 3: #spider encounter
+        print('You\'ve been walking for a while but it\'s too dark, you can\'t see more than a few feet in front of you.')
+        input()
+        if companion == 1:
+            print('your companion shouts to you "wow I can\'t see a thing!"')
+            if order == 1:
+                print('You turn back to look at him, and behind him you see two giant glowing eyes.')
+                print('slowly it comes into focus, the front legs, the fangs dripping with poison.')
+                input()
+                while True:
+                    print('What do you do??')
+                    print('1. Let the spider take him')
+                    print('2. Shout to warn him')
+                    action = int(input())
+                    if action ==1 or action ==2:
+                        break
+                    else:
+                        print('Invalid input')
+                if action == 1:
+                    print('You decide to let the spider take him. Better him than you.')
+                    print('"YEEEARGHHH!!" he yells and screams in pain, striking at the beast with his fist, but it has no effect. The spider drags him off')
+                    input()
+                    companion = 0
+                else:
+                    print('"Behind you!" you shout.')
+                    input()
+                    print('He turns and sees the foul beast, just as it lunges at him.')
+                    print('You wish you could help him but there is just not enough room on the path')
+                    survive = randint(1,3)
+                    if survive > 1:
+                        print('He grabs the spiders fangs and manages to keep them from stabbing into him')
+                        input()
+                        print('You notice that the spider is putting most of it\'s weight on a loose pile of rocks near the edge of the chasm')
+                        input()
+                        print('You pick up a rock and throw it at the pile...')
+                        input()
+                        print('and it hits!, the pile of rocks goes tumbling, along with the spider')
+                        input()
+                        if protag.checkIng(8):
+                            print('[Intelligence Check Success] You realize that you should check if the spider left a line securing it, that it could use to climb back up')
+                            input()
+                            print('Sure enough, when you go to check there is a thick strand of spider silk attached to the chasm wall, and down below you can already see the glowing eyes climbing back to you')
+                            print('\nYou grab a nearby rock and bash at the soil around the line until it gives way, and you see the eyes fall into the abyss\n')
+                            input()
+
+                    else:
+                        print('"YEEEARGHHH!!" he yells and screams in pain, striking at the beast with his fist, but it has no effect. The spider drags him off')
+                        input()
+                        companion = 0
+            else:
+                print('suddenly you feel a presence behind you. You turn and see two glowing eyes, attached to two huge fangs dripping with poison')
+                print('it\'s a giant spider!')
+                protag = giantSpider(protag, order, companion)
+                
+        if companion == 2:
+            print('you don\'t know how the goblins are doing it but they seem to be navigating the darkness with no problem at all')
+            if order == 1:
+                print('"What\'s the hold up??" you hear greg shout forward, "I thought an',protag.race,'was sposed to be all better than us goblins"')
+                input()
+                print('You turn back to look at him, and behind him you see two giant glowing eyes.')
+                print('slowly it comes into focus, the front legs, the fangs dripping with poison.')
+                input()
+                print('before you can react you see the giant spider lash out, and sink its fangs deep into Greg')
+                print('"YEEEARGHHH!!" he yells and screams in pain, striking at the beast with his fist, but it has no effect. The spider drags him off')
+                input()
+                print('you find yourself grateful the you decided to lead the pack, and just hope that greg is enough to satisfy the spider')
+                input()
+                companion = 3 #indicates 1 goblin remaining
+            else:
+                print('suddenly you feel a presence behind you. You turn and see two glowing eyes, attached to two huge fangs dripping with poison')
+                print('it\'s a giant spider!')
+                protag = giantSpider(protag, order, companion)
+
+        if companion == 0:
+            print('suddenly you feel a presence behind you. You turn and see two glowing eyes, attached to two huge fangs dripping with poison')
+            print('it\'s a giant spider!')
+            protag = giantSpider(protag, order, companion)
+            
+    print('after a few minutes, you approach what appears to be a rickity rope bridge over a deep chasm')
+    if companion == 2:
+        print('Crumble shouts, "Don\'t worry boss, we put this bridge up. Sturdy as can be"')
+    if encounter == 3: #Bridge Encounter
+        if companion == 0 and goblins_alive == True:
+            print('As you approach the bridge, you kick the roap to test it\'s strength. It doesn\'t seem terribly sturdy. One quick hit to one of the stake holding it down might send it tumbling')
+            input()
+            print('Suddenly, you here a commotion behind you. "Hey! Who\'s that up ahead!"')
+            print('it\'s golbins!')
+            while True:
+                print('What do you do??')
+                print('1. Stand and fight')
+                print('2. Run across the bridge')
+                action = int(input())
+                if action == 1 or action == 2:
+                    break
+                else:
+                    print('Invalid input')
+            if action == 1:
+                results = goblin_encounter(protag, True)
+                protag = results[0]
+                if protag.hlth <=0:
+                    sys.exit()
+            else:
+                print('You dash across the bridge.. somehow it manages to stay intact. But the goblins are close behind you')
+                while True:
+                    print('What do you do??')
+                    print('1. Try to knock down the bridge [Strength]')
+                    print('2. Keep running!')
+                    action = int(input())
+                    if action ==1 or action ==2:
+                        break
+                    else:
+                        print('Invalid input')
+                if action ==1:
+                    print('As the goblins pour onto the bridge you kick one the stakes holding it as hard as you can')
+                    input()
+                    str_check = protag.checkStg(7)
+                    if str_check:
+                        print('And it gives! The goblins go tumbling into the abyss!')
+                        input()
+                    else:
+                        print('But it\'s no good! The stake budges but doesn\'t come free!')
+                        print('Before you have a chance to do anything else the goblins are on you!')
+                        results = goblin_encounter(protag, True)
+                        protag = results[0]
+                        if protag.hlth <=0:
+                            sys.exit()
+        if companion == 1 and goblins_alive == True:
+            print('As you approach the bridge, you kick the roap to test it\'s strength. It doesn\'t seem terribly sturdy. One quick hit to one of the stake holding it down might send it tumbling')
+            input()
+            print('Suddenly, you here a commotion behind you. "Hey! Who\'s that up ahead!"')
+            print('it\'s golbins!')
+            input()
+            if order == 2:
+                print('Your companion sees the goblins and shouts "Quick, run!"')
+                print('As he runs across the bridge, his foot catches on a loose board, and before he can catch himself he tumbles over into the abyss')
+                while True:
+                    print('What do you do??')
+                    print('1. Stand and fight')
+                    print('2. Run across the bridge')
+                    action = int(input())
+                    if action == 1 or action == 2:
+                        break
+                    else:
+                        print('Invalid input')
+                if action == 1:
+                    results = goblin_encounter(protag, True)
+                    protag = results[0]
+                    if protag.hlth <=0:
+                        sys.exit()
+                else:
+                    print('You dash across the bridge.. somehow it manages to stay intact. But the goblins are close behind you')
+                    while True:
+                        print('What do you do??')
+                        print('1. Try to knock down the bridge [Strength]')
+                        print('2. Keep running!')
+                        action = int(input())
+                        if action ==1 or action ==2:
+                            break
+                        else:
+                            print('Invalid input')
+                    if action ==1:
+                        print('As the goblins pour onto the bridge you kick one the stakes holding it as hard as you can')
+                        input()
+                        str_check = protag.checkStg(7)
+                        if str_check:
+                            print('And it gives! The goblins go tumbling into the abyss!')
+                            input()
+                        else:
+                            print('But it\'s no good! The stake budges but doesn\'t come free!')
+                            print('Before you have a chance to do anything else the goblins are on you!')
+                            results = goblin_encounter(protag, True)
+                            protag = results[0]
+                            if protag.hlth <=0:
+                                sys.exit()
+            else:
+                while True:
+                    print('"What should we do??" Your companion shouts')
+                    print('1. "Stand and fight!"')
+                    print('2. "Stand and fight!"[Lie][Charisma]')
+                    print('3. "Run!" [Speed]')
+                    action = int(input())
+                    if action in [1,2,3]:
+                        break
+                    else:
+                        print('Invalid input')
+                if action == 1:
+                    print('"Good idea!" But as you turn around he bolts across the bridge')
+                    print('But his foot catches on a loose board, and before he can catch himself he tumbles over into the abyss')
+                    results = goblin_encounter(protag, True)
+                    protag = results[0]
+                    if protag.hlth <=0:
+                        sys.exit()
+                elif action == 2:
+                    cha_check = protag.checkCha(6)
+                    if cha_check:
+                        print('"Good idea!" he shouts and turns to face the goblins')
+                        print('But as he does you bolt across the bridge. He turns and looks at you with a face of betrayal as the goblins attack him')
+                        print('It seems like the goblins will be occupied with him for at least a few moments.')
+                        attempts = 0
+                        while attempts < 3:
+                            print("What do you do??")
+                            print('1. Run')
+                            print('2. Try to knock down the bridge [strength]')
+                            action2 = int(input())
+                            if action2 == 1:
+                                print('You decide it\'s best to get as far away from the situation as possible and keep running down the path')
+                                attempts = 3
+                            elif action2 == 2:
+                                print('You kick at the stake holding one of the ropes in place..')
+                                input()
+                                str_check = protag.checkStg(7)
+                                if str_check:
+                                    print('And it gives! The bridge goes tumbling into the chasm! there\'s no way for the goblins to reach you now!')
+                                    input()
+                                    attempts = 3
+                                else:
+                                    if attempts < 2:
+                                        print('But it\'s no good! The stake moves but doesn\'t give. But the goblins are occupied and there might be time to try again')
+                                        attempts += 1
+                                    else:
+                                        print('But it\'s no good! and you\'re out of time! the goblins are on you!')
+                                        attempts = 3
+                                        results = goblin_encounter(protag, True)
+                                        protag = results[0]
+                                        if protag.hlth <=0:
+                                            sys.exit()
+                else:
+                    spd_check = protag.checkSpd(5)
+                    print('"Run!" you shout, and you both bolt across the bridge')
+                    input()
+                    if spd_check:
+                        print('and you\'re able to lose them! but they\'re sill behind you somewhere..')
+                    else:
+                        print('But your companion trips on a board, and goes tumbling into the abyss! Even the split second you take to turn and look is too long, and the goblins are one you!')
+                        results = goblin_encounter(protag, True)
+                        protag = results[0]
+                        if protag.hlth <=0:
+                            sys.exit()
     return protag
 
 def safeSleep(protag, goblins_alive):
@@ -580,5 +856,5 @@ def safeSleep(protag, goblins_alive):
             print('Invalid response, please enter the number of the action you would like to perform.')
     return protag
 
-#protag = character('John', 'Orc', 18, 18, 0, 18, 15)
-#print(sleep(protag))
+##protag = character('John', 'Orc', 18, 18, 0, 18, 15)
+##print(exploreDarkCave(protag,1,1))
