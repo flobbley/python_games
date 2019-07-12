@@ -27,7 +27,7 @@ def playerInput(availableGuesses):
 def compGuessImpossible(availableGuesses, position, rnd):
     """
     computer cannot lose
-    in first round, computer checks if middle square is taken. if middle square is taken, computer marks space the block eventual player win
+    in first round, computer checks if middle square is taken. if middle square is taken, computer marks space to block eventual player win.
     in second round, computer checks which additional space is taken and will play accordingly to block player win
     computer will check if the player is about to win, and block if so
     computer will check if it can win, and win if so
@@ -172,9 +172,9 @@ def playOrder():
         print("Who goes first?")
         order = input('1. Me\n2. Computer\n')
         if order == '1':
-            return 1
+            return 0
         elif order == '2':
-            return 2
+            return 1
 
 def playerTurn(availableGuesses, position):
     #player turn
@@ -195,12 +195,11 @@ def computerTurn(availableGuesses, position, difficulty, rnd):
         pos2 = compGuessEasy(availableGuesses)
     elif difficulty == 3:
         pos2 = compGuessImpossible(availableGuesses, position, rnd)
-        rnd += 1
     position[pos2-1] = 2
     availableGuesses = guessRemover(pos2, availableGuesses)
     won = isWon(position, 2)
     print(ticPrint(position))
-    return availableGuesses, position, won, rnd
+    return availableGuesses, position, won
 
 def ticTacToe():
     playing = True
@@ -210,7 +209,6 @@ def ticTacToe():
         print('Welcome to Tic-Tac-Toe!')
         print()
         print('+++++++++++++++++++++++++++++++')
-        rnd = 0
         availableGuesses = [1,2,3,4,5,6,7,8,9]
         position = [0,0,0,0,0,0,0,0,0]
         difficulty = diffSelect()
@@ -221,10 +219,9 @@ def ticTacToe():
         position = [0,0,0,0,0,0,0,0,0]
         won = False
         while not won:
-            if order ==1:
-                
+            
+            if order == 0:                
                 availableGuesses, position, won = playerTurn(availableGuesses, position)
-                
                 if won == True:
                     print('You win!\n')
                     break
@@ -232,19 +229,8 @@ def ticTacToe():
                     print('Stalemate!\n')
                     break
                 
-                input('Press ENTER to continue\n')
-                
-                availableGuesses, position, won, rnd = computerTurn(availableGuesses, position, difficulty, rnd)
-                
-                if won == True:
-                    print('The computer wins this round!\n')
-                    break
-                if len(availableGuesses) == 0:
-                    print('Stalemate!\n')
-                    break
             else:
-                availableGuesses, position, won, rnd = computerTurn(availableGuesses, position, difficulty, rnd)
-
+                availableGuesses, position, won = computerTurn(availableGuesses, position, difficulty, rnd)
                 if won == True:
                     print('The computer wins this round!\n')
                     break
@@ -252,16 +238,10 @@ def ticTacToe():
                     print('Stalemate!\n')
                     break
 
-                input('Press ENTER to continue\n')
-
-                availableGuesses, position, won = playerTurn(availableGuesses, position)
-
-                if won == True:
-                    print('You win!\n')
-                    break
-                if len(availableGuesses) == 0:
-                    print('Stalemate!\n')
-                    break
+            order = 1 - order
+            rnd+=1
+            
+            input('Press ENTER to continue\n')
                 
         print('Would you like to play again? y/n')
         game = input()
@@ -270,4 +250,6 @@ def ticTacToe():
             print('\nGoodbye!')
             input()
     return ''
+
+
 
