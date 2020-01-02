@@ -1,5 +1,13 @@
 from random import *
+import os
 
+global clearVar
+syst = os.name
+if syst == 'nt':
+    clearVar = "cls"
+else:
+    clearVar = "clear"
+    
 class card(object):
     """
     cards in the deck, 4 copies of each
@@ -201,6 +209,7 @@ def blackJack():
             cardCount = False
         else:
             print('Invalid Input')
+    os.system(clearVar)
     playing = True
     bank_track = [0, 200, 200]
     #Player Turn
@@ -208,7 +217,8 @@ def blackJack():
         print(win,'wins', loss, 'losses\n')
         bank_track = betting(bank_track, winCond)
         if bank_track[1] <= 0 or bank_track[2] <=0:
-            break    
+            break
+        os.system(clearVar)
         hands = deal(deck)
         player_hand = hands[0]
         dealer_hand = hands[1]
@@ -228,6 +238,7 @@ def blackJack():
         while not valid:
             print('What would you like to do?')
             action = input('1. Hit\n2. Stay\n')
+            os.system(clearVar)
             
             if action == '1':
                 update = hit(player_hand, deck)
@@ -240,7 +251,10 @@ def blackJack():
                 #checks total
 
                 ptotal = total(player_hand)
+                print('You:')
                 print(printHand(player_hand))
+                print('Dealer:')
+                print(dealer_hand[0].getPic(),'| |')
                 if cardCount:
                     print('Current count:', count_display)
                 print()
@@ -270,7 +284,9 @@ def blackJack():
         #Dealer Turn
         if winCond == 0:
             bust = False
+            os.system(clearVar)
             print('Dealer\'s Turn')
+            print('Dealer:')
             print(printHand(dealer_hand))
             dtotal = total(dealer_hand)
             print('Dealer total:',dtotal)
@@ -280,6 +296,13 @@ def blackJack():
                 ace = aceCheck(dealer_hand)
                 dtotal = aceTotal(dealer_hand, ace)
             while dtotal < 17:
+                os.system(clearVar)
+                print('You:')
+                print(printHand(player_hand))
+                print('Your total:',ptotal)
+                print('Dealer:')
+                print(printHand(dealer_hand))
+                print('Dealer total:',dtotal)
                 print('\nDealer hit\'s')
                 input()
                 update2 = hit(dealer_hand, deck)
@@ -289,23 +312,30 @@ def blackJack():
                 countAdd.append(dealer_hand[-1])
                 count = card_count(countAdd, count)
                 dtotal = total(dealer_hand)
+                os.system(clearVar)
+                print('You:')
+                print(printHand(player_hand))
+                print('Your total:',ptotal)
+                print('Dealer:')
                 print(printHand(dealer_hand))
                 if cardCount:
                     print('Current Count:',count)
                 if dtotal > 21:
                     ace = aceCheck(dealer_hand)
                     if ace == 0:
+                        print('Dealer total:',dtotal)
                         print('\nDealer busts!')
                         bust = True
                         winCond = 2
                     else:
                         dtotal = aceTotal(dealer_hand, ace)
                         if dtotal > 21:
+                            print('Dealer total:',dtotal)
                             print('\nDealer busts!')
                             bust = True
                             winCond = 2
+                
                         
-                print('Dealer total:',dtotal)
             if dtotal == ptotal:
                 winCond = 1
             elif ptotal > dtotal:
@@ -313,11 +343,14 @@ def blackJack():
             elif ptotal < dtotal and bust == False:
                 winCond = 3
         if winCond == 3:
+            print('Dealer total:',dtotal)
             print('\nYou lose this hand')
             loss += 1
         elif winCond == 1:
+            print('Dealer total:',dtotal)
             print('\nIt\'s a Push')
         elif winCond == 2:
+            print('Dealer total:',dtotal)
             print('\nYou win this hand!')
             win +=1
 
@@ -325,6 +358,7 @@ def blackJack():
         valid2 = False
         while not valid2:
             keepplaying = input('\nWould you like to play another hand?\n1. Yes \n2. No\n')
+            os.system(clearVar)
             if keepplaying == '1':
                 print()
                 valid2 = True

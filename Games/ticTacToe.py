@@ -2,6 +2,14 @@
 Tic Tac Toe
 """
 from random import *
+import os
+
+global clearVar
+syst = os.name
+if syst == 'nt':
+    clearVar = "cls"
+else:
+    clearVar = "clear"
 
 def playerInput(availableGuesses):
     valid = False
@@ -189,10 +197,13 @@ def playerTurn(availableGuesses, position):
     """
     player turn
     """
+    os.system(clearVar)
+    print(ticPrint(position))
     pos1 = playerInput(availableGuesses) #asks the player for a guess
     position[pos1-1] = 1 #places a player marker in the space chosen
     availableGuesses = guessRemover(pos1, availableGuesses) #removes guessed space from available guesses
     won = isWon(position, 1) #checks if the player won in this round
+    os.system(clearVar)
     print('Your move:')
     print(ticPrint(position))
     return availableGuesses, position, won
@@ -201,6 +212,7 @@ def computerTurn(availableGuesses, position, difficulty, rnd):
     """
     Computer turn, plays according to difficulty selected
     """
+    os.system(clearVar)
     print('Computer plays:')
     if difficulty == 2:
         pos2 = compGuessMedium(availableGuesses, position)
@@ -225,12 +237,10 @@ def ticTacToe():
         availableGuesses = [1,2,3,4,5,6,7,8,9] #fills the available guess positions
         position = [0,0,0,0,0,0,0,0,0] #blanks the board
         difficulty = diffSelect()
-        print(ticPrint(position))
         order = playOrder() #determines play order, 0 is player first, 1 is computer first
         rnd = 0
         won = False
         while not won:
-            
             if order == 0: #when "order" is 0 it is the player's turn             
                 availableGuesses, position, won = playerTurn(availableGuesses, position)
                 if won == True:

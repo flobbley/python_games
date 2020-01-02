@@ -8,6 +8,14 @@
 # (so be sure to read the docstrings!)
 
 import random
+import os
+
+global clearVar
+syst = os.name
+if syst == 'nt':
+    clearVar = "cls"
+else:
+    clearVar = "clear"
 
 WORDLIST_FILENAME = "words.txt"
 
@@ -115,8 +123,12 @@ def hangman(secretWord):
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
     numGuesses = 8
     while numGuesses > 0:
+        input()
+        os.system(clearVar)
         valid = False
         while not valid:
+            print(hungMan(numGuesses))
+            print(getGuessedWord(secretWord, lettersGuessed))
             print('you have',numGuesses,'guesses left\n')
             print('Available letters:',getAvailableLetters(lettersGuessed))
             if len(lettersGuessed)>0:
@@ -135,7 +147,6 @@ def hangman(secretWord):
                 print('\nYou\'ve already guessed that letter:',getGuessedWord(secretWord, lettersGuessed))
             else:
                 print('\nthat is not a valid input')
-        print(hungMan(numGuesses))
         
         if isWordGuessed(secretWord, lettersGuessed):
             print('Congratulations, you won!\nThe man is saved!')

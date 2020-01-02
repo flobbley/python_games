@@ -1,4 +1,12 @@
 import os, keyboard, time, random
+
+global clearVar
+syst = os.name
+if syst == 'nt':
+    clearVar = "cls"
+else:
+    clearVar = "clear"
+    
 def gridSet(x, y, positions, apple):
     """
     Draws grid with all relevant characters
@@ -91,11 +99,12 @@ def directionChanger(direction):
         direction = 'right'
     return direction
 
-def snake(x, y):
+def snake():
     """
     Main Game
     """
     while True: #plays until the player wants to quit
+        x, y = 25, 15
         pos1 = [x//2, y//2] #sets inial conditions
         pos2 = [pos1[0]+1, pos1[1]]
         pos3 = [pos1[0]+2, pos1[1]]
@@ -104,8 +113,9 @@ def snake(x, y):
         apple = applePlacer(x,y,positions)
         score = 0
         while True: #Cycles through drawing grid and getting player input
-            os.system('cls')
+            os.system(clearVar)
             gridSet(x, y, positions, apple)
+            print('Score:', score)
             time.sleep(.15) #delay after input and drawing grid
             try:
                 positions, direction, apple, score = moveChar(x, y, positions, direction, apple, score)
@@ -114,11 +124,9 @@ def snake(x, y):
                 print('Game Over!')
                 input()
                 break
-            print('Score:', score)
         print('Would you like to play again? y/n') #prompt player to play again if they lose
         again = input()
         if again == 'n':
             print('Bye!')
             input()
             break
-print(snake(30, 25))
