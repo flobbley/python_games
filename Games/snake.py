@@ -13,13 +13,18 @@ def gridSet(x, y, positions, apple):
     """
     appleChar = 'x'
     spaceChar = ' '
+    topChar = '-'
+    sideChar = '|'
     char = 'O'
     down = 0
+    print(topChar*(x+2))
     for height in range(y): #begins building grid by row
         right = 0
         down += 1
         line = ''
-        for width in range(x): #for each row adds spaces
+        for width in range(x+1): #for each row adds spaces
+            if right == 0 or right == x:
+                line+=sideChar
             right += 1
             if [right, down] in positions: #adds symbol for snake if coord is snake
                 line+=char
@@ -28,6 +33,7 @@ def gridSet(x, y, positions, apple):
             else:
                 line+=spaceChar #otherwise adds empy char
         print(line)
+    print(topChar*(x+2))
 
 def appleRandom(x,y):
     """
@@ -89,14 +95,18 @@ def directionChanger(direction):
     """
     Checks if the player is changing direction by checking if the player is pressing a key
     """
-    if keyboard.is_pressed('w'):
-        direction = 'up'
-    elif keyboard.is_pressed('s'):
-        direction = 'down'
-    elif keyboard.is_pressed('a'):
-        direction = 'left'
-    elif keyboard.is_pressed('d'):
-        direction = 'right'
+    if keyboard.is_pressed('up'):
+        if direction != 'down':
+            direction = 'up'
+    elif keyboard.is_pressed('down'):
+        if direction != 'up':
+            direction = 'down'
+    elif keyboard.is_pressed('left'):
+        if direction != 'right':
+            direction = 'left'
+    elif keyboard.is_pressed('right'):
+        if direction != 'left':
+            direction = 'right'
     return direction
 
 def snake():
@@ -104,7 +114,7 @@ def snake():
     Main Game
     """
     while True: #plays until the player wants to quit
-        x, y = 25, 15
+        x, y = 18, 10
         pos1 = [x//2, y//2] #sets inial conditions
         pos2 = [pos1[0]+1, pos1[1]]
         pos3 = [pos1[0]+2, pos1[1]]
