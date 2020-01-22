@@ -114,23 +114,40 @@ def snake():
     """
     Main Game
     """
-    while True: #plays until the player wants to quit
+    while True: #Start Game Loop, starts new games until the player wants to quit
         os.system(clearVar)
-        x, y = 18, 10
-        pos1 = [x//2, y//2] #sets inial conditions
+
+        x, y = 18, 10 #sets board size
+
+        pos1 = [x//2, y//2] #sets inital snake positions
         pos2 = [pos1[0]+1, pos1[1]]
         pos3 = [pos1[0]+2, pos1[1]]
         positions = [pos3, pos2, pos1]
-        direction = 'up'
-        apple = applePlacer(x,y,positions)
+        
+        apple = applePlacer(x,y,positions) #places starting apple
+        gridSet(x, y, positions, apple) #sets up initial grid
+
         score = 0
-        gridSet(x, y, positions, apple)
         delay = 150
-        startTurn = int(round(time.time()*1000)) 
-        while True: #Cycles through drawing grid and getting player input
-            direction = directionChanger(direction) #constantly checks for player input even if not drawing a new board
+        startTurn = int(round(time.time()*1000))
+        checked = 0
+        direction = 'wait'
+
+        while direction == 'wait': #waits to start game until player starts moving
+            direction = directionChanger(direction)
+            if direction == 'right': #can't move right because the snake starts facing left
+                direction = 'wait'
+            
+        while True: #Main Game Loop. Cycles through drawing grid and getting player input
+            if checked == False:
+                directionTemp = directionChanger(direction) #Checks for player input until a valid change is detected
+                if directionTemp != direction:
+                    direction = directionTemp
+                    checked = True #if the player changes direction, disables player input until the board is redrawn. Otherwise playe can run into themselves between screen draws
             currentTime = int(round(time.time()*1000))
             if currentTime > startTurn+delay: #Checks if the delay time has passed, if so starts the new turn
+                checked = False
+                direction = directionTemp
                 try: #if moveChar returns False, will give a TypeError. This means a Game Over has happened
                     positions, direction, apple, score = moveChar(x, y, positions, direction, apple, score)
                     os.system(clearVar)
@@ -141,6 +158,7 @@ def snake():
                     print('Game Over!')
                     input()
                     break
+
         print('Would you like to play again? y/n') #prompt player to play again if they lose
         again = input()
         if again == 'n':
