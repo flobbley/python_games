@@ -9,7 +9,9 @@ else:
     
 def gridSet(x, y, positions, apple):
     """
-    Draws grid with all relevant characters
+    Draws grid with all relevant characters.
+    Starts at the top of the board and draws the board row by row using the coordinates "right" and "down"
+    At each coordinate checks what mark should be printed and adds it to a line string which is printed for each row 
     """
     appleChar = 'x'
     spaceChar = ' '
@@ -17,14 +19,14 @@ def gridSet(x, y, positions, apple):
     sideChar = '|'
     char = 'O'
     down = 0
-    print(topChar*(x+2))
+    print(topChar*(x+2)) #adds top and bottom border
     for height in range(y): #begins building grid by row
         right = 0
         down += 1
         line = ''
-        for width in range(x+1): #for each row adds spaces
+        for width in range(x+1): #goes through row unit by unit
             if right == 0 or right == x:
-                line+=sideChar
+                line+=sideChar #adds right and left border
             right += 1
             if [right, down] in positions: #adds symbol for snake if coord is snake
                 line+=char
@@ -58,7 +60,6 @@ def moveChar(x,y,positions, direction, apple, score):
     """
     Moves the snake around the grid and keeps track of score
     """
-    direction = directionChanger(direction) #checks if the player is changing direction
     pos1 = [positions[len(positions)-1][0],positions[len(positions)-1][1]] #creates a copy coordinate of the front of player snake
     if direction == 'up': #moves the front coordinate in the relevant direction temporarily until conditions can be checked
         pos1[1] -= 1
@@ -96,7 +97,7 @@ def directionChanger(direction):
     Checks if the player is changing direction by checking if the player is pressing a key
     """
     if keyboard.is_pressed('up'):
-        if direction != 'down':
+        if direction != 'down': #won't let player move in the opposite direction they are currently moving
             direction = 'up'
     elif keyboard.is_pressed('down'):
         if direction != 'up':
@@ -114,6 +115,7 @@ def snake():
     Main Game
     """
     while True: #plays until the player wants to quit
+        os.system(clearVar)
         x, y = 18, 10
         pos1 = [x//2, y//2] #sets inial conditions
         pos2 = [pos1[0]+1, pos1[1]]
@@ -122,18 +124,23 @@ def snake():
         direction = 'up'
         apple = applePlacer(x,y,positions)
         score = 0
+        gridSet(x, y, positions, apple)
+        delay = 150
+        startTurn = int(round(time.time()*1000)) 
         while True: #Cycles through drawing grid and getting player input
-            os.system(clearVar)
-            gridSet(x, y, positions, apple)
-            print('Score:', score)
-            time.sleep(.15) #delay after input and drawing grid
-            try:
-                positions, direction, apple, score = moveChar(x, y, positions, direction, apple, score)
-                #if moveChar returns False, will give a TypeError. This means a Game Over has happened
-            except TypeError:
-                print('Game Over!')
-                input()
-                break
+            direction = directionChanger(direction) #constantly checks for player input even if not drawing a new board
+            currentTime = int(round(time.time()*1000))
+            if currentTime > startTurn+delay: #Checks if the delay time has passed, if so starts the new turn
+                try: #if moveChar returns False, will give a TypeError. This means a Game Over has happened
+                    positions, direction, apple, score = moveChar(x, y, positions, direction, apple, score)
+                    os.system(clearVar)
+                    gridSet(x, y, positions, apple)
+                    print('Score:', score)
+                    startTurn = int(round(time.time()*1000)) #sets the start time for the turn
+                except TypeError:
+                    print('Game Over!')
+                    input()
+                    break
         print('Would you like to play again? y/n') #prompt player to play again if they lose
         again = input()
         if again == 'n':
