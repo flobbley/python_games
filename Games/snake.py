@@ -1,4 +1,4 @@
-import os, keyboard, time, random
+import os, keyboard, time, random, pickle
 
 global clearVar
 syst = os.name
@@ -127,16 +127,16 @@ def levelSelect():
     gives blocked spaced based on the player's level selection
     """
 
-    level0 = [] #sets the blocked squares
-    level1 = [[5,5],[5,6],[5, 4],[5,7],[5, 8],[5, 3],[14, 3],[14, 4],[14,5],[14,6],[14,7],[14,8]]
-    levels = [level0, level1]#adds the level options to the level array
+    level1 = [] #sets the blocked squares
+    level2 = [[5,5],[5,6],[5, 4],[5,7],[5, 8],[5, 3],[14, 3],[14, 4],[14,5],[14,6],[14,7],[14,8]]
+    levels = [level1, level2]#adds the level options to the level array
     while True:
         print('Which level would you like to play?')
         level = input('1. Open\n2. Parallel\n')
         try:
             a = int(level)
             try:
-                return levels[a-1]
+                return levels[a-1], a-1
             except IndexError: #won't let player select level not in the options
                 print('Invalid Selection')
                 input()
@@ -145,13 +145,29 @@ def levelSelect():
             print('Invalid Selection')
             input()
             os.system(clearVar)
-        
+            
+class hiScore:
+    def __init__(self):
+        self.levelScores = [0,0]
+
+    def load(self):
+        try:
+            with open('hiScore','rb') as f:
+                oldScores = pickle.load(f)
+            self.levelScores = oldScores.levelScores
+        except FileNotFoundError:
+            self.levelScores = [0,0]
+
+    def save(self):
+        with open('hiScore','wb') as f:
+            pickle.dump(self,f,protocol=2)
 
 def snake():
     """
     Main Game
     """
-    hiScore = 0
+    hiScores = hiScore()
+    hiScores.load()
     while True: #Start Game Loop, starts new games until the player wants to quit
         os.system(clearVar)
         print('+++++++++++++++++++++++++++++++')
@@ -165,8 +181,8 @@ def snake():
         pos2 = [pos1[0]+1, pos1[1]]
         pos3 = [pos1[0]+2, pos1[1]]
         positions = [pos3, pos2, pos1]
-        blocked = levelSelect()
-
+        blocked, level = levelSelect()
+        
         score = 0
         delay = 150
         startTurn = int(round(time.time()*1000))
@@ -177,7 +193,7 @@ def snake():
         apple = applePlacer(x,y,positions, blocked) #places starting apple
         gridSet(x, y, positions, apple, blocked) #sets up initial grid
         print('Score:', score)
-        print('High Score:', hiScore)
+        print('High Score:', hiScores.levelScores[level])
 
         while direction == 'wait': #waits to start game until player starts moving
             direction = directionChanger(direction)
@@ -199,12 +215,12 @@ def snake():
                     os.system(clearVar)
                     gridSet(x, y, positions, apple, blocked)
                     print('Score:', score)
-                    print('High Score:', hiScore)
+                    print('High Score:', hiScores.levelScores[level])
                     startTurn = int(round(time.time()*1000)) #sets the start time for the turn
                 except TypeError:
                     print('Game Over!')
-                    if score >hiScore:
-                        hiScore = score
+                    if score >hiScores.levelScores[level]:
+                        hiScores.levelScores[level] = score
                         print('New High Score!')
                     input()
                     break
@@ -212,6 +228,7 @@ def snake():
         print('Would you like to play again? y/n') #prompt player to play again if they lose
         again = input()
         if again == 'n':
+            hiScores.save()
             print('Bye!')
             input()
             break
