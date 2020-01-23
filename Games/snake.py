@@ -22,8 +22,9 @@ def gridSet(x, y, positions, apple, blocked):
     blockedChar = '█'
     down = 0
     lineBreak = '\n'
-    lines = []
-    print(topChar*(x+2)) #adds top and bottom border
+    lines = [] #creates an array that will be joined later to form the play grid
+    topRow = topChar*(x+2) #adds top border
+    lines.append(topRow) #adds lines one by one to the grid array
     for height in range(y): #begins building grid by row
         right = 0
         down += 1
@@ -40,8 +41,11 @@ def gridSet(x, y, positions, apple, blocked):
                 line+=blockedChar
             else:
                 line+=spaceChar #otherwise adds empy char
-        print(line)
-    print(bottomChar*(x+2))
+        lines.append(line) #adds line to the grid array
+    bottomRow = bottomChar*(x+2)
+    lines.append(bottomRow)
+    grid = lineBreak.join(lines)#joins together the grid array with line breaks between lines
+    print(grid) #print all lines at once to reduce flicker
 
 def appleRandom(x,y):
     """
@@ -123,9 +127,9 @@ def levelSelect():
     gives blocked spaced based on the player's level selection
     """
 
-    level0 = []
+    level0 = [] #sets the blocked squares
     level1 = [[5,5],[5,6],[5, 4],[5,7],[5, 8],[5, 3],[14, 3],[14, 4],[14,5],[14,6],[14,7],[14,8]]
-    levels = [level0, level1]
+    levels = [level0, level1]#adds the level options to the level array
     while True:
         print('Which level would you like to play?')
         level = input('1. Open\n2. Parallel\n')
@@ -133,11 +137,11 @@ def levelSelect():
             a = int(level)
             try:
                 return levels[a-1]
-            except IndexError:
+            except IndexError: #won't let player select level not in the options
                 print('Invalid Selection')
                 input()
                 os.system(clearVar)
-        except ValueError:
+        except ValueError: #won't let player enter something other than a number
             print('Invalid Selection')
             input()
             os.system(clearVar)
@@ -163,15 +167,17 @@ def snake():
         positions = [pos3, pos2, pos1]
         blocked = levelSelect()
 
-        os.system(clearVar)
-        apple = applePlacer(x,y,positions, blocked) #places starting apple
-        gridSet(x, y, positions, apple, blocked) #sets up initial grid
-
         score = 0
         delay = 150
         startTurn = int(round(time.time()*1000))
         checked = 0
         direction = 'wait'
+
+        os.system(clearVar)
+        apple = applePlacer(x,y,positions, blocked) #places starting apple
+        gridSet(x, y, positions, apple, blocked) #sets up initial grid
+        print('Score:', score)
+        print('High Score:', hiScore)
 
         while direction == 'wait': #waits to start game until player starts moving
             direction = directionChanger(direction)
@@ -200,6 +206,7 @@ def snake():
                     if score >hiScore:
                         hiScore = score
                         print('New High Score!')
+                    input()
                     break
 
         print('Would you like to play again? y/n') #prompt player to play again if they lose
