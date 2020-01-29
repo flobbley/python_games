@@ -108,6 +108,8 @@ def directionChanger(direction):
     """
     Checks if the player is changing direction by checking if the player is pressing a key
     """
+    opposites = [['up','down'],['down','up'],['right','left'],['left','right']]
+    
     if keyboard.is_pressed('up'):
         if direction != 'down': #won't let player move in the opposite direction they are currently moving
             direction = 'up'
@@ -128,11 +130,13 @@ def levelSelect():
     """
 
     level1 = [] #sets the blocked squares
-    level2 = [[5,5],[5,6],[5, 4],[5,7],[5, 8],[5, 3],[14, 3],[14, 4],[14,5],[14,6],[14,7],[14,8]]
-    levels = [level1, level2]#adds the level options to the level array
+    level2 = [[5,5],[5,6],[5, 4],[5,7],[5, 8],[5, 3],[5,9],[15, 3],[15, 4],[15,5],[15,6],[15,7],[15,8], [15,9]]
+    level3 = [[10,2],[10,3],[10,4],[10,5],[10,6],[10,7],[10,8],[10,9],[10,10],[3,6],[4,6],[5,6],[6,6],[7,6],[8,6],[9,6],[11,6],[12,6],[13,6],[14,6],[15,6],[16,6],[17,6]]
+    level4 = [[2,2],[3,3],[4,4],[5,5],[2,10],[3,9],[4,8],[5,7],[17,2],[16,3],[15,4],[14,5],[17,10],[16,9],[15,8],[14,7]]
+    levels = [level1, level2, level3, level4]#adds the level options to the level array
     while True:
         print('Which level would you like to play?')
-        level = input('1. Open\n2. Parallel\n')
+        level = input('1. Open\n2. Parallel\n3. Tee\n4. Cross\n')
         try:
             a = int(level)
             try:
@@ -148,7 +152,7 @@ def levelSelect():
             
 class hiScore:
     def __init__(self):
-        self.levelScores = [0,0]
+        self.levelScores = [0,0,0,0]
 
     def load(self):
         try:
@@ -156,7 +160,7 @@ class hiScore:
                 oldScores = pickle.load(f)
             self.levelScores = oldScores.levelScores
         except FileNotFoundError:
-            self.levelScores = [0,0]
+            self.levelScores = [0,0,0,0]
 
     def save(self):
         with open('hiScore','wb') as f:
@@ -175,7 +179,7 @@ def snake():
         print('        ~~~~Snake!~~~~')
         print()
         print('+++++++++++++++++++++++++++++++')
-        x, y = 18, 10 #sets board size
+        x, y = 19, 11 #sets board size
 
         pos1 = [x//2, y//2] #sets inital snake positions
         pos2 = [pos1[0]+1, pos1[1]]
@@ -221,6 +225,7 @@ def snake():
                     print('Game Over!')
                     if score >hiScores.levelScores[level]:
                         hiScores.levelScores[level] = score
+                        hiScores.save()
                         print('New High Score!')
                     input()
                     break
@@ -228,7 +233,6 @@ def snake():
         print('Would you like to play again? y/n') #prompt player to play again if they lose
         again = input()
         if again == 'n':
-            hiScores.save()
             print('Bye!')
             input()
             break
